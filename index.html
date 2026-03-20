@@ -350,84 +350,6 @@
       position: absolute; inset: 0;
       background: linear-gradient(to top, rgba(61,42,36,0.3), transparent 60%);
     }
-    /* ── ラップトップPC オーバーレイ ── */
-    .laptop-overlay {
-      position: absolute; bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 82%; z-index: 6;
-      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.45));
-    }
-    .laptop-screen {
-      width: 100%;
-      background: #1a1a2e;
-      border-radius: 10px 10px 0 0;
-      padding: 7px 7px 0;
-      border: 2px solid #3a3a4e;
-      border-bottom: none;
-    }
-    .laptop-screen-display {
-      background: linear-gradient(135deg, #0d2b54 0%, #1a4a8a 45%, #0f3060 100%);
-      border-radius: 5px 5px 0 0;
-      height: 90px;
-      padding: 9px 10px;
-      overflow: hidden;
-      position: relative;
-    }
-    .ls-topbar {
-      height: 9px; background: rgba(255,255,255,0.08);
-      border-radius: 4px; margin-bottom: 8px; position: relative;
-    }
-    .ls-topbar::before {
-      content: ''; position: absolute; left: 6px; top: 50%;
-      transform: translateY(-50%);
-      width: 5px; height: 5px; border-radius: 50%;
-      background: #e87; box-shadow: 9px 0 0 #ea9, 18px 0 0 #ada;
-    }
-    .ls-topbar::after {
-      content: ''; position: absolute; left: 0; top: 0;
-      width: 40%; height: 100%;
-      background: rgba(255,200,160,0.35); border-radius: 4px;
-    }
-    .ls-line { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.11); margin-bottom: 5px; }
-    .ls-line:nth-child(2) { width: 78%; }
-    .ls-line:nth-child(3) { width: 60%; }
-    .ls-line:nth-child(4) { width: 42%; }
-    .ls-cursor {
-      display: inline-block; width: 6px; height: 11px;
-      background: rgba(255,220,160,0.7); border-radius: 1px;
-      animation: blink 1.1s step-end infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .laptop-base {
-      background: linear-gradient(180deg, #d6d6d6 0%, #b8b8b8 100%);
-      border-radius: 0 0 8px 8px;
-      padding: 7px 11px 7px;
-      border: 2px solid #a8a8a8; border-top: 1.5px solid #c8c8c8;
-    }
-    .laptop-keyboard { display: flex; flex-direction: column; gap: 3px; margin-bottom: 5px; }
-    .kb-row { display: flex; gap: 2px; }
-    .kb-row span {
-      display: block; height: 7px; flex: 1;
-      background: linear-gradient(180deg, #d0d0d0 0%, #b0b0b0 100%);
-      border-radius: 2px; border-bottom: 1.5px solid #959595;
-    }
-    .kb-row:last-child span:first-child { flex: 0 0 10%; }
-    .kb-row:last-child span:nth-child(2) { flex: 0 0 50%; }
-    .kb-row:last-child span:last-child { flex: 0 0 10%; }
-    .laptop-trackpad {
-      width: 38%; height: 12px;
-      background: linear-gradient(180deg, #cacaca 0%, #b2b2b2 100%);
-      border: 1px solid #a0a0a0; border-radius: 4px; margin: 0 auto;
-    }
-    /* スクリーン光の演出 */
-    .screen-glow {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 120px; z-index: 5; pointer-events: none;
-      background: linear-gradient(to top,
-        rgba(30, 80, 160, 0.22) 0%,
-        rgba(20, 60, 130, 0.10) 50%,
-        transparent 100%);
-    }
     .about-tag-float {
       position: absolute; bottom: 32px; left: 32px;
       background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
@@ -835,29 +757,8 @@
   <div class="section-inner">
     <div class="about-wrap">
       <div class="about-img-wrap" id="about-img-wrap">
-        <img src="./secretary-woman-cropped.png" alt="PCで作業する女性" id="about-img" />
+        <img src="./secretary-woman-pc.png" alt="PCで作業する女性" id="about-img" />
         <div class="about-img-overlay"></div>
-        <div class="screen-glow"></div>
-        <div class="laptop-overlay">
-          <div class="laptop-screen">
-            <div class="laptop-screen-display">
-              <div class="ls-topbar"></div>
-              <div class="ls-line"></div>
-              <div class="ls-line"></div>
-              <div class="ls-line"></div>
-              <span class="ls-cursor"></span>
-            </div>
-          </div>
-          <div class="laptop-base">
-            <div class="laptop-keyboard">
-              <div class="kb-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-              <div class="kb-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-              <div class="kb-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-              <div class="kb-row"><span></span><span></span><span></span></div>
-            </div>
-            <div class="laptop-trackpad"></div>
-          </div>
-        </div>
         <div class="about-tag-float" id="about-float">
           <strong>500+</strong>
           受講生が働き方を変えました
