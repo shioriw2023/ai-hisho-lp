@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIで選ばれる秘書講座 | あなたの働き方を、次のステージへ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ivory: #FFF8F5;
+      --blush: #FDE8E0;
+      --rose:  #E8917F;
+      --gold:  #C9A05A;
+      --dark:  #3D2A24;
+      --mid:   #7A6058;
+      --light: #FFFFFF;
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--ivory);
+      color: var(--dark);
+      line-height: 1.8;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── MODAL ─── */
+    #modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(61,42,36,0.5);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+    #modal-overlay.open { opacity: 1; pointer-events: all; }
+    #modal {
+      background: #fff; border-radius: 28px;
+      padding: 48px 44px; max-width: 480px; width: 100%;
+      position: relative;
+      transform: translateY(24px) scale(0.97);
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+      max-height: 90vh; overflow-y: auto;
+    }
+    #modal-overlay.open #modal { transform: translateY(0) scale(1); }
+    #modal-close {
+      position: absolute; top: 20px; right: 20px;
+      background: none; border: none; font-size: 18px;
+      color: var(--mid); cursor: none; width: 32px; height: 32px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    #modal-close:hover { background: var(--blush); }
+    .modal-label {
+      font-size: 10px; letter-spacing: 0.25em; color: var(--gold); margin-bottom: 12px;
+    }
+    .modal-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 22px; line-height: 1.5; margin-bottom: 12px; color: var(--dark);
+    }
+    .modal-sub { font-size: 13px; color: var(--mid); line-height: 1.9; margin-bottom: 32px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--dark); margin-bottom: 8px;
+    }
+    .req {
+      background: var(--rose); color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 400;
+    }
+    .form-group input {
+      width: 100%; padding: 14px 18px; border-radius: 12px;
+      border: 1.5px solid #EDD9CC; background: var(--ivory);
+      font-size: 14px; font-family: 'Noto Sans JP', sans-serif;
+      color: var(--dark); outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus { border-color: var(--rose); background: #fff; }
+    .form-group input::placeholder { color: #C4A89E; }
+    .form-group select {
+      width: 100%; padding: 14px 18px; border-radius: 12px;
+      border: 1.5px solid #EDD9CC; background: var(--ivory);
+      font-size: 14px; font-family: 'Noto Sans JP', sans-serif;
+      color: var(--dark); outline: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C4A89E' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 18px center;
+      cursor: pointer; transition: border-color 0.3s;
+    }
+    .form-group select:focus { border-color: var(--rose); background-color: #fff; }
+    .form-submit {
+      width: 100%; padding: 18px;
+      background: linear-gradient(135deg, var(--rose), var(--gold));
+      color: #fff; border: none; border-radius: 50px;
+      font-size: 15px; font-family: 'Noto Sans JP', sans-serif;
+      letter-spacing: 0.06em; cursor: none;
+      margin-top: 8px;
+      box-shadow: 0 8px 32px rgba(232,145,127,0.35);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .form-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(232,145,127,0.45); }
+    .modal-note { font-size: 11px; color: var(--mid); text-align: center; margin-top: 16px; }
+
+    /* ─── GRAIN OVERLAY ─── */
+    #grain {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* ─── PROGRESS BAR ─── */
+    #progress {
+      position: fixed; top: 0; left: 0; z-index: 200;
+      height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--rose), var(--gold));
+      transition: width 0.1s linear;
+    }
+
+    /* ─── CUSTOM CURSOR ─── */
+    #cursor-outer {
+      position: fixed; z-index: 9998; pointer-events: none;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1.5px solid rgba(201,137,122,0.6);
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s, border-color 0.3s, background 0.3s;
+      mix-blend-mode: multiply;
+    }
+    #cursor-dot {
+      position: fixed; z-index: 9999; pointer-events: none;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--rose);
+      transform: translate(-50%, -50%);
+    }
+    body.cursor-hover #cursor-outer {
+      width: 64px; height: 64px;
+      background: rgba(232,145,127,0.1);
+      border-color: var(--rose);
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 48px;
+      background: rgba(255,248,245,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201,160,90,0.15);
+    }
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 15px; letter-spacing: 0.08em; color: var(--gold);
+    }
+    .nav-links {
+      display: flex; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 12px; letter-spacing: 0.12em; color: var(--mid);
+      text-decoration: none; transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--rose); }
+    .nav-cta {
+      background: var(--dark);
+      color: #fff; text-decoration: none;
+      border-radius: 30px; padding: 11px 28px;
+      font-size: 12px; letter-spacing: 0.08em;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--rose); transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; align-items: flex-start;
+      padding: 0 80px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #FFF0EB 0%, #FDE8E0 50%, #F5D5C8 100%);
+    }
+    .hero-bg-img {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&fit=crop&auto=format') center/cover;
+      opacity: 0.08;
+      will-change: transform;
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 800px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; letter-spacing: 0.25em; color: var(--gold);
+      margin-bottom: 40px; overflow: hidden;
+    }
+    .hero-tag span { display: inline-block; }
+    #hero h1 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(40px, 6vw, 80px);
+      font-weight: 600; line-height: 1.25;
+      color: var(--dark); margin-bottom: 32px;
+    }
+    .reveal-line {
+      display: block; overflow: hidden; line-height: 1.3;
+    }
+    .reveal-inner { display: block; transform: translateY(110%); }
+    .gold-text { color: var(--rose); }
+    .hero-sub {
+      font-size: clamp(14px, 1.6vw, 17px);
+      color: var(--mid); max-width: 480px;
+      line-height: 2; margin-bottom: 48px;
+      opacity: 0;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--dark);
+      color: #fff; text-decoration: none;
+      padding: 20px 48px; border-radius: 60px;
+      font-size: 14px; letter-spacing: 0.1em;
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), background 0.3s;
+      opacity: 0; position: relative; overflow: hidden;
+    }
+    .btn-primary::after {
+      content: ''; position: absolute; inset: 0;
+      background: var(--rose);
+      transform: translateX(-101%);
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+      z-index: 0;
+    }
+    .btn-primary:hover::after { transform: translateX(0); }
+    .btn-primary span { position: relative; z-index: 1; }
+    .hero-note { margin-top: 16px; font-size: 11px; color: var(--mid); letter-spacing: 0.08em; opacity: 0; }
+
+    .hero-scroll {
+      position: absolute; right: 48px; bottom: 80px; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      font-size: 9px; letter-spacing: 0.2em; color: var(--mid);
+      writing-mode: vertical-rl;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scroll-line 2s ease-in-out infinite;
+    }
+    @keyframes scroll-line {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    .hero-counter {
+      position: absolute; right: 120px; bottom: 80px; z-index: 2;
+      display: flex; gap: 48px;
+    }
+    .counter-item { text-align: center; opacity: 0; }
+    .counter-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px; color: var(--dark); line-height: 1;
+    }
+    .counter-label { font-size: 10px; letter-spacing: 0.15em; color: var(--mid); margin-top: 4px; }
+
+    /* ─── MARQUEE ─── */
+    #marquee {
+      background: var(--dark); overflow: hidden;
+      padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .marquee-track {
+      display: flex; gap: 0; white-space: nowrap;
+      animation: marquee 20s linear infinite;
+    }
+    .marquee-item {
+      flex-shrink: 0; padding: 0 48px;
+      font-family: 'DM Serif Display', serif;
+      font-size: 13px; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.4);
+      display: flex; align-items: center; gap: 24px;
+    }
+    .marquee-item em { color: var(--rose); font-style: normal; }
+    .marquee-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ─── SECTION BASE ─── */
+    section { padding: 120px 80px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 10px; letter-spacing: 0.25em; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 16px; display: block;
+      overflow: hidden;
+    }
+    .section-label span { display: inline-block; transform: translateY(100%); }
+    .section-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(26px, 3.5vw, 48px);
+      font-weight: 600; line-height: 1.4; margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .section-title span { display: block; transform: translateY(100%); }
+    .divider {
+      width: 0px; height: 1px; background: var(--gold); margin: 24px 0 48px;
+    }
+    .section-desc { color: var(--mid); font-size: 15px; line-height: 2; }
+
+    /* ─── PAIN ─── */
+    #pain { background: #FFF0EB; padding: 120px 80px; }
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px; margin-top: 56px;
+    }
+    .pain-card {
+      background: #fff;
+      border-radius: 20px; overflow: hidden;
+      transform: translateY(60px); opacity: 0;
+      transition: box-shadow 0.4s;
+    }
+    .pain-card:hover { box-shadow: 0 20px 60px rgba(232,145,127,0.2); }
+    .pain-card-img {
+      width: 100%; height: 200px; object-fit: cover; display: block;
+      transform: scale(1.08);
+      transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
+    }
+    .pain-card:hover .pain-card-img { transform: scale(1); }
+    .pain-card-body { padding: 20px 20px 24px; }
+    .pain-card p { font-size: 14px; line-height: 1.9; color: var(--mid); }
+
+    /* ─── ABOUT ─── */
+    #about { background: var(--ivory); }
+    .about-wrap {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+    }
+    .about-img-wrap {
+      position: relative; aspect-ratio: 4/5;
+      border-radius: 24px; overflow: hidden;
+    }
+    .about-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transform: scale(1.15);
+      will-change: transform;
+    }
+    .about-img-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(61,42,36,0.3), transparent 60%);
+    }
+    .about-tag-float {
+      position: absolute; bottom: 32px; left: 32px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+      border-radius: 12px; padding: 16px 20px;
+      font-size: 12px; color: var(--dark);
+      transform: translateY(20px); opacity: 0;
+    }
+    .about-tag-float strong { display: block; font-size: 20px; font-family: 'DM Serif Display',serif; color: var(--rose); }
+    .about-text h3 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .about-text p { color: var(--mid); font-size: 15px; line-height: 2.1; margin-bottom: 16px; }
+    .about-points { list-style: none; margin-top: 24px; }
+    .about-points li {
+      padding: 12px 0; border-bottom: 1px solid var(--blush);
+      font-size: 14px; display: flex; align-items: center; gap: 12px;
+      transform: translateX(-20px); opacity: 0;
+    }
+    .about-points li::before { content: '✦'; color: var(--gold); font-size: 9px; flex-shrink: 0; }
+
+    /* ─── CURRICULUM ─── */
+    #curriculum { background: var(--blush); }
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px; margin-top: 56px;
+    }
+    @media (max-width: 1000px) { .curriculum-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { .curriculum-grid { grid-template-columns: 1fr; } }
+    .lesson-card {
+      background: var(--light); border-radius: 20px;
+      padding: 36px 24px 28px; position: relative;
+      transform: translateY(40px); opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), box-shadow 0.4s;
+    }
+    .lesson-card:hover {
+      transform: translateY(-6px) !important;
+      box-shadow: 0 20px 48px rgba(42,36,32,0.12);
+    }
+    .lesson-num {
+      position: absolute; top: -16px; left: 28px;
+      background: linear-gradient(135deg, var(--rose), var(--gold));
+      color: #fff; width: 36px; height: 36px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500;
+    }
+    .lesson-card h4 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 16px; margin-bottom: 10px; color: var(--dark);
+    }
+    .lesson-card p { font-size: 13px; color: var(--mid); line-height: 1.9; }
+
+    /* ─── INSTRUCTOR ─── */
+    #instructor { background: var(--ivory); }
+    .instructor-wrap {
+      display: flex; gap: 72px; align-items: center;
+      background: var(--light); border-radius: 40px;
+      padding: 64px 72px;
+      box-shadow: 0 8px 60px rgba(42,36,32,0.06);
+    }
+    .instructor-photo {
+      width: 220px; height: 220px; flex-shrink: 0;
+      border-radius: 50%; overflow: hidden;
+      border: 6px solid var(--blush);
+      box-shadow: 0 8px 40px rgba(232,145,127,0.25);
+      transform: scale(0.85); opacity: 0;
+    }
+    .instructor-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .instructor-info { transform: translateX(40px); opacity: 0; }
+    .instructor-info h3 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 26px; margin-bottom: 4px;
+    }
+    .instructor-info .title {
+      color: var(--gold); font-size: 11px; letter-spacing: 0.15em; margin-bottom: 24px; display: block;
+    }
+    .instructor-info p { color: var(--mid); font-size: 14px; line-height: 2.1; margin-bottom: 12px; }
+    .instructor-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .badge {
+      background: var(--blush); color: var(--rose);
+      font-size: 11px; padding: 6px 16px; border-radius: 20px;
+    }
+
+    /* ─── VOICES ─── */
+    #voices { background: var(--blush); }
+    .voice-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px; margin-top: 56px;
+    }
+    .voice-card {
+      background: #fff; border-radius: 24px; padding: 40px 36px;
+      transform: translateY(50px); opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), box-shadow 0.4s;
+    }
+    .voice-card:hover { box-shadow: 0 16px 48px rgba(232,145,127,0.15); transform: translateY(-4px) !important; }
+    .voice-stars { color: var(--gold); font-size: 14px; margin-bottom: 20px; letter-spacing: 4px; }
+    .voice-text { color: var(--mid); font-size: 14px; line-height: 2.1; margin-bottom: 28px; }
+    .voice-person { display: flex; align-items: center; gap: 14px; }
+    .voice-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+      border: 2px solid var(--blush);
+    }
+    .voice-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .voice-name { font-size: 13px; color: var(--dark); font-weight: 500; }
+    .voice-meta { font-size: 11px; color: var(--mid); margin-top: 2px; }
+
+    /* ─── PRICE ─── */
+    #price { background: var(--ivory); }
+    .price-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px; margin-top: 56px; align-items: center;
+    }
+    .price-card {
+      background: var(--light); border-radius: 28px;
+      padding: 44px 40px; text-align: center;
+      transform: translateY(40px); opacity: 0;
+      transition: box-shadow 0.4s, transform 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+    .price-card:hover { box-shadow: 0 20px 60px rgba(42,36,32,0.1); transform: translateY(-6px) !important; }
+    .price-card.featured {
+      background: linear-gradient(160deg, var(--rose), var(--gold));
+      color: #fff;
+      box-shadow: 0 20px 60px rgba(232,145,127,0.35);
+      transform: translateY(40px) scale(1.04) !important;
+    }
+    .price-card.featured:hover { transform: translateY(-6px) scale(1.04) !important; }
+    .price-name { font-size: 11px; letter-spacing: 0.2em; margin-bottom: 20px; opacity: 0.7; }
+    .price-amount { font-family: 'DM Serif Display', serif; font-size: 48px; margin-bottom: 8px; line-height: 1; }
+    .price-amount span { font-size: 20px; }
+    .price-tax { font-size: 11px; opacity: 0.55; margin-bottom: 28px; }
+    .price-features { list-style: none; text-align: left; margin: 28px 0; }
+    .price-features li {
+      font-size: 13px; padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; gap: 10px;
+    }
+    .price-card.featured .price-features li { border-color: rgba(255,255,255,0.2); }
+    .price-features li::before { content: '✓'; color: var(--gold); flex-shrink: 0; }
+    .price-card.featured .price-features li::before { color: #fff; }
+    .btn-outline {
+      display: inline-block; text-decoration: none;
+      border: 1.5px solid var(--dark); color: var(--dark);
+      padding: 14px 40px; border-radius: 40px; font-size: 13px;
+      letter-spacing: 0.08em; transition: all 0.3s; margin-top: 12px;
+    }
+    .btn-outline:hover { background: var(--dark); color: #fff; }
+    .price-card.featured .btn-outline { border-color: #fff; color: #fff; }
+    .price-card.featured .btn-outline:hover { background: rgba(255,255,255,0.25); }
+
+    /* ─── FAQ ─── */
+    #faq { background: #FFF0EB; }
+    .faq-list { margin-top: 56px; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: var(--light); border-radius: 20px; overflow: hidden;
+      transform: translateX(-30px); opacity: 0;
+    }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 24px 32px; cursor: pointer;
+      font-size: 15px; font-weight: 500; gap: 16px;
+    }
+    .faq-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1.5px solid var(--gold); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--gold);
+      transition: transform 0.4s, background 0.3s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--gold); color: #fff; }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.23,1,0.32,1);
+      font-size: 14px; color: var(--mid); line-height: 2; padding: 0 32px;
+    }
+    .faq-item.open .faq-a { max-height: 200px; padding: 0 32px 28px; }
+
+    /* ─── CTA ─── */
+    #cta {
+      background: linear-gradient(160deg, #FDE8E0 0%, #FFF0EB 100%);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-bg-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(80px, 15vw, 200px);
+      color: rgba(232,145,127,0.06);
+      white-space: nowrap; pointer-events: none; user-select: none;
+      letter-spacing: -0.02em;
+    }
+    #cta .section-inner { position: relative; z-index: 1; }
+    #cta p { color: var(--mid); font-size: 16px; line-height: 2.2; max-width: 520px; margin: 0 auto 56px; }
+    .cta-btn-wrap { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .btn-cta-main {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--dark); color: #fff; text-decoration: none;
+      padding: 22px 56px; border-radius: 60px;
+      font-size: 15px; letter-spacing: 0.1em;
+      box-shadow: 0 8px 40px rgba(61,42,36,0.2);
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), box-shadow 0.4s;
+      position: relative; overflow: hidden;
+    }
+    .btn-cta-main::after {
+      content: ''; position: absolute; inset: 0; background: var(--rose);
+      transform: translateX(-101%);
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+    .btn-cta-main:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(232,145,127,0.35); }
+    .btn-cta-main:hover::after { transform: translateX(0); }
+    .btn-cta-main span { position: relative; z-index: 1; }
+    .cta-note { margin-top: 24px; font-size: 12px; color: var(--mid); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,0.25);
+      text-align: center; padding: 40px 24px;
+      font-size: 11px; letter-spacing: 0.1em;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      section { padding: 80px 24px; }
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      #hero { padding: 0 24px 80px; }
+      .hero-counter { display: none; }
+      .about-wrap { grid-template-columns: 1fr; gap: 48px; }
+      .about-img-wrap { aspect-ratio: 3/2; }
+      .pain-grid { grid-template-columns: repeat(2, 1fr); }
+      .voice-grid { grid-template-columns: 1fr; }
+      .price-cards { grid-template-columns: 1fr; }
+      .instructor-wrap { flex-direction: column; padding: 40px 32px; text-align: center; }
+      .instructor-badges { justify-content: center; }
+      .price-card.featured { transform: translateY(40px) !important; }
+    }
+    @media (max-width: 600px) {
+      #hero h1 { font-size: 32px; }
+      .pain-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- FORM MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close">✕</button>
+    <p class="modal-label">1DAY SEMINAR</p>
+    <h2 class="modal-title">無料1dayセミナー<br>お申込みフォーム</h2>
+    <p class="modal-sub">必要事項をご入力の上、送信してください。<br>その後、公式LINEへご案内します。</p>
+    <form id="seminar-form" method="POST" action="https://script.google.com/macros/s/AKfycbwaTZHWskFh4Pmtr63BltzIMqiuZQT0WWEXIAUJGuYiSR2a5I4fagQVog-hRyOjc9Fh/exec" target="hidden-iframe">
+      <div class="form-group">
+        <label>お名前 <span class="req">必須</span></label>
+        <input type="text" name="name" placeholder="山田 花子" required />
+      </div>
+      <div class="form-group">
+        <label>メールアドレス <span class="req">必須</span></label>
+        <input type="email" name="email" placeholder="example@email.com" required />
+      </div>
+      <div class="form-group">
+        <label>電話番号</label>
+        <input type="tel" name="phone" placeholder="090-0000-0000" />
+      </div>
+      <div class="form-group">
+        <label>現在のお仕事</label>
+        <input type="text" name="job" placeholder="例：役員秘書、一般事務、主婦など" />
+      </div>
+      <div class="form-group">
+        <label>LINEアカウント名</label>
+        <input type="text" name="line" placeholder="例：山田花子" />
+      </div>
+      <div class="form-group">
+        <label>今回のセミナーをどこで知りましたか？</label>
+        <select name="source">
+          <option value="" disabled selected>選択してください</option>
+          <option value="Instagram">Instagram</option>
+          <option value="X（Twitter）">X（Twitter）</option>
+          <option value="TikTok">TikTok</option>
+          <option value="YouTube">YouTube</option>
+          <option value="Google検索">Google検索</option>
+          <option value="友人・知人の紹介">友人・知人の紹介</option>
+          <option value="公式LINE">公式LINE</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <button type="submit" class="form-submit">フォームを送信して専用LINEに登録する</button>
+    </form>
+    <p class="modal-note">✦ 送信後、公式LINEの登録ページへ移動します</p>
+  </div>
+</div>
+<iframe name="hidden-iframe" style="display:none;"></iframe>
+
+<div id="grain"></div>
+<div id="progress"></div>
+<div id="cursor-outer"></div>
+<div id="cursor-dot"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">AI HISHO ACADEMY</div>
+  <ul class="nav-links">
+    <li><a href="#pain">悩み</a></li>
+    <li><a href="#about">講座概要</a></li>
+    <li><a href="#curriculum">カリキュラム</a></li>
+    <li><a href="#price">料金</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">無料説明会へ</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-img" id="hero-parallax"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag"><span>✦ NEW COURSE 2026 ✦</span></div>
+    <h1>
+      <span class="reveal-line"><span class="reveal-inner"><span class="gold-text">AI</span>に選ばれる、</span></span>
+      <span class="reveal-line"><span class="reveal-inner">これからの</span></span>
+      <span class="reveal-line"><span class="reveal-inner"><span class="gold-text">秘書</span>になる。</span></span>
+    </h1>
+    <p class="hero-sub">
+      「このままでいいのかな」と感じているあなたへ。<br>
+      AIを味方につけて、<strong>圧倒的に頼られる存在</strong>へと<br>
+      働き方を、丸ごと変えていく講座です。
+    </p>
+    <a href="#cta" class="btn-primary magnetic">
+      <span>無料説明会に参加する</span>
+      <span>→</span>
+    </a>
+    <p class="hero-note">※ 参加費無料 / オンライン開催 / 所要時間 60分</p>
+  </div>
+
+  <div class="hero-counter">
+    <div class="counter-item">
+      <div class="counter-num" data-target="500">0</div>
+      <div class="counter-label">GRADUATES</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" data-target="68">0</div>
+      <div class="counter-label">% SATISFACTION</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" data-target="8">0</div>
+      <div class="counter-label">LESSONS</div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">SCROLL <div class="hero-scroll-line"></div></div>
+</section>
+
+<!-- MARQUEE -->
+<div id="marquee">
+  <div class="marquee-track">
+    <div class="marquee-item">AI × 秘書 <span class="marquee-dot"></span></div>
+    <div class="marquee-item"><em>NEXT STAGE</em> <span class="marquee-dot"></span></div>
+    <div class="marquee-item">これからの働き方 <span class="marquee-dot"></span></div>
+    <div class="marquee-item"><em>AI HISHO ACADEMY</em> <span class="marquee-dot"></span></div>
+    <div class="marquee-item">キャリアを変える <span class="marquee-dot"></span></div>
+    <div class="marquee-item"><em>2026 NEW COURSE</em> <span class="marquee-dot"></span></div>
+    <div class="marquee-item">AI × 秘書 <span class="marquee-dot"></span></div>
+    <div class="marquee-item"><em>NEXT STAGE</em> <span class="marquee-dot"></span></div>
+    <div class="marquee-item">これからの働き方 <span class="marquee-dot"></span></div>
+    <div class="marquee-item"><em>AI HISHO ACADEMY</em> <span class="marquee-dot"></span></div>
+    <div class="marquee-item">キャリアを変える <span class="marquee-dot"></span></div>
+    <div class="marquee-item"><em>2026 NEW COURSE</em> <span class="marquee-dot"></span></div>
+  </div>
+</div>
+
+<!-- PAIN -->
+<section id="pain">
+  <div class="section-inner">
+    <p class="section-label"><span>YOUR STRUGGLES</span></p>
+    <h2 class="section-title"><span>こんな悩み、ありませんか？</span></h2>
+    <div class="divider"></div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <img class="pain-card-img" src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=360&fit=crop&auto=format" alt="" />
+        <div class="pain-card-body">
+          <p>毎日忙しいのに、なんとなく<strong style="color:var(--rose)">成長している気がしない</strong>。</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <img class="pain-card-img" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=360&fit=crop&auto=format" alt="" />
+        <div class="pain-card-body">
+          <p>スキルはあるはずなのに、<strong style="color:var(--rose)">なぜか評価されていない</strong>気がする。</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <img class="pain-card-img" src="https://images.unsplash.com/photo-1485217988980-11786ced9454?w=600&h=360&fit=crop&auto=format" alt="" />
+        <div class="pain-card-body">
+          <p>AIに仕事を奪われそうで、<strong style="color:var(--rose)">これからが不安</strong>でたまらない。</p>
+        </div>
+      </div>
+      <div class="pain-card">
+        <img class="pain-card-img" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=360&fit=crop&auto=format" alt="" />
+        <div class="pain-card-body">
+          <p>「もっと自分らしく働きたい」のに、<strong style="color:var(--rose)">何から始めればいいかわからない</strong>。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-wrap">
+      <div class="about-img-wrap" id="about-img-wrap">
+        <img src="./secretary-woman-cropped.png" alt="PCで作業する女性" id="about-img" />
+        <div class="about-img-overlay"></div>
+        <div class="about-tag-float" id="about-float">
+          <strong>500+</strong>
+          受講生が働き方を変えました
+        </div>
+      </div>
+      <div class="about-text">
+        <p class="section-label"><span>ABOUT THIS COURSE</span></p>
+        <h2 class="section-title"><span>「AIで選ばれる<br>秘書講座」とは</span></h2>
+        <div class="divider" id="about-divider"></div>
+        <p>
+          これからの時代、秘書に求められるのは<strong>「AIと協働できる力」</strong>です。
+          タスク管理・議事録・スケジュール調整…あなたが手を動かしてきた業務の多くは、
+          AIが驚くほど速く、正確にこなします。
+        </p>
+        <p>
+          でも、それはチャンスです。<br>
+          AIを使いこなし、<strong>人にしかできない判断・配慮・信頼構築</strong>に集中できる
+          秘書は、これからの職場で圧倒的に必要とされます。
+        </p>
+        <ul class="about-points">
+          <li>全カリキュラムがオンラインで完結</li>
+          <li>実務で即使えるAIツールを厳選して習得</li>
+          <li>30代・キャリア転換組も多数受講</li>
+          <li>受講後のコミュニティで継続的にサポート</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRICULUM -->
+<section id="curriculum">
+  <div class="section-inner">
+    <p class="section-label"><span>CURRICULUM</span></p>
+    <h2 class="section-title"><span>カリキュラム</span></h2>
+    <div class="divider" id="curr-divider"></div>
+    <p class="section-desc">全8回・約3ヶ月のプログラム。基礎から実践まで、無理なく身につきます。</p>
+    <div class="curriculum-grid">
+      <div class="lesson-card"><div class="lesson-num">1</div><h4>AIと働く時代の秘書像</h4><p>AIの現状を正しく理解し、これからの秘書に求められるスキルセットを整理します。</p></div>
+      <div class="lesson-card"><div class="lesson-num">2</div><h4>ChatGPTで業務を10倍速に</h4><p>メール作成・議事録・報告書——日常業務をAIに任せるプロンプト術を習得。</p></div>
+      <div class="lesson-card"><div class="lesson-num">3</div><h4>スケジュール管理の最適化</h4><p>AIカレンダーツールとNotionを組み合わせ、複数役員のスケジュールを一元管理。</p></div>
+      <div class="lesson-card"><div class="lesson-num">4</div><h4>情報収集・リサーチの自動化</h4><p>AIを使ったリサーチフローで、質の高い情報を最短時間で届ける方法を学びます。</p></div>
+      <div class="lesson-card"><div class="lesson-num">5</div><h4>コミュニケーションの品格</h4><p>AIでたたき台を作りつつ、「あなたらしさ」で信頼を積み上げるコミュニケーション術。</p></div>
+      <div class="lesson-card"><div class="lesson-num">6</div><h4>プレゼン資料の自動生成</h4><p>Canva AI・Gamma・Slidesなどを使い、プロ品質の資料を短時間で仕上げます。</p></div>
+      <div class="lesson-card"><div class="lesson-num">7</div><h4>危機管理とAIリスク対応</h4><p>AIの誤情報・情報漏洩リスクを理解し、安全に使いこなすための判断軸を養います。</p></div>
+      <div class="lesson-card"><div class="lesson-num">8</div><h4>あなたのAI秘書スタイル確立</h4><p>ここまでの学びを統合し、自分ならではのAI活用スタイルをかたちにします。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTRUCTOR -->
+<section id="instructor">
+  <div class="section-inner">
+    <p class="section-label"><span>INSTRUCTOR</span></p>
+    <h2 class="section-title"><span>講師紹介</span></h2>
+    <div class="divider" id="inst-divider"></div>
+    <div class="instructor-wrap">
+      <div class="instructor-photo">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face&auto=format" alt="講師 山田紗季" />
+      </div>
+      <div class="instructor-info">
+        <h3>山田 紗季（やまだ さき）</h3>
+        <span class="title">EXECUTIVE SECRETARY / AI BUSINESS CONSULTANT</span>
+        <p>大手外資系企業にてCEO秘書を10年以上務めた後、AIツールの業務活用に特化したコンサルタントとして独立。現在は国内外の企業向けに研修・講演を行いながら、「AIに選ばれる人材育成」をミッションに活動中。</p>
+        <p>「AIを怖がらず、でも正しく怖がる」という信念のもと、現場で使える実践的なカリキュラムを提供しています。</p>
+        <div class="instructor-badges">
+          <span class="badge">秘書検定1級</span>
+          <span class="badge">ITパスポート</span>
+          <span class="badge">プロンプトエンジニアリング認定</span>
+          <span class="badge">MBA（経営学修士）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VOICES -->
+<section id="voices">
+  <div class="section-inner">
+    <p class="section-label"><span>STUDENT VOICES</span></p>
+    <h2 class="section-title"><span>受講生の声</span></h2>
+    <div class="divider" id="voices-divider"></div>
+    <div class="voice-grid">
+      <div class="voice-card">
+        <div class="voice-stars">★★★★★</div>
+        <p class="voice-text">「AIって難しそう」と思っていたけど、実務に直結した内容ですんなり入ってきました。今では議事録作成の時間が3分の1以下に！同僚からも「何か変わった？」と言われるほど仕事が変わりました。</p>
+        <div class="voice-person">
+          <div class="voice-avatar"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=100&h=100&fit=crop&crop=face&auto=format" alt="K.M さん" /></div>
+          <div><p class="voice-name">K.M さん（34歳）</p><p class="voice-meta">商社 / 役員秘書 → AI活用秘書へ</p></div>
+        </div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-stars">★★★★★</div>
+        <p class="voice-text">転職を考えていたのですが、この講座で自分の市場価値が上がったと実感。現職で昇給も叶い、まずは今の場所で輝こうと気持ちが切り替わりました。働き方そのものが変わる講座です。</p>
+        <div class="voice-person">
+          <div class="voice-avatar"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face&auto=format" alt="T.A さん" /></div>
+          <div><p class="voice-name">T.A さん（31歳）</p><p class="voice-meta">IT企業 / 部長秘書</p></div>
+        </div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-stars">★★★★★</div>
+        <p class="voice-text">子育て中でも週末の隙間時間で学べました。講師の山田先生がとにかく親身で、個別の質問にも丁寧に答えてくれます。受講後のコミュニティも居心地よく、ずっとつながっています。</p>
+        <div class="voice-person">
+          <div class="voice-avatar"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=face&auto=format" alt="Y.S さん" /></div>
+          <div><p class="voice-name">Y.S さん（37歳）</p><p class="voice-meta">医療法人 / 理事長秘書</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE -->
+<section id="price">
+  <div class="section-inner">
+    <p class="section-label"><span>PRICE</span></p>
+    <h2 class="section-title"><span>料金プラン</span></h2>
+    <div class="divider" id="price-divider"></div>
+    <div class="price-cards">
+      <div class="price-card">
+        <p class="price-name">LIGHT</p>
+        <p class="price-amount"><span>¥</span>49,800</p>
+        <p class="price-tax">（税込）</p>
+        <ul class="price-features">
+          <li>全8回の講義動画（見放題）</li>
+          <li>テキスト・ワークシート</li>
+          <li>質問フォーム（文字のみ）</li>
+          <li style="opacity:0.3">個別フィードバック</li>
+          <li style="opacity:0.3">卒業後コミュニティ</li>
+        </ul>
+        <a href="#cta" class="btn-outline magnetic">このプランで始める</a>
+      </div>
+      <div class="price-card featured">
+        <p class="price-name">✦ STANDARD（人気No.1）</p>
+        <p class="price-amount"><span>¥</span>89,800</p>
+        <p class="price-tax">（税込）</p>
+        <ul class="price-features">
+          <li>全8回の講義動画（見放題）</li>
+          <li>テキスト・ワークシート</li>
+          <li>月2回ライブQ&Aセッション</li>
+          <li>個別フィードバック（3回）</li>
+          <li>卒業後コミュニティ（永久）</li>
+        </ul>
+        <a href="#cta" class="btn-outline magnetic">このプランで始める</a>
+      </div>
+      <div class="price-card">
+        <p class="price-name">PREMIUM</p>
+        <p class="price-amount"><span>¥</span>148,000</p>
+        <p class="price-tax">（税込）</p>
+        <ul class="price-features">
+          <li>全8回の講義動画（見放題）</li>
+          <li>テキスト・ワークシート</li>
+          <li>月2回ライブQ&Aセッション</li>
+          <li>個別フィードバック（無制限）</li>
+          <li>卒業後コミュニティ（永久）</li>
+        </ul>
+        <a href="#cta" class="btn-outline magnetic">このプランで始める</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-inner">
+    <p class="section-label"><span>FAQ</span></p>
+    <h2 class="section-title"><span>よくある質問</span></h2>
+    <div class="divider" id="faq-divider"></div>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q">AIやPCが苦手でも受講できますか？<div class="faq-icon">+</div></div><div class="faq-a">はい、まったく問題ありません。本講座はAI初心者の方を前提に設計されており、基礎から丁寧に解説します。スマートフォンが使えれば受講できます。</div></div>
+      <div class="faq-item"><div class="faq-q">現在秘書でなくても受講できますか？<div class="faq-icon">+</div></div><div class="faq-a">もちろんです。「秘書的な動き方を身につけたい」「AIを使って業務効率を上げたい」という方にも広く対応した内容です。職種は問いません。</div></div>
+      <div class="faq-item"><div class="faq-q">動画はいつでも見られますか？<div class="faq-icon">+</div></div><div class="faq-a">はい、すべての録画講義は購入後すぐに視聴可能です。期間制限はなく、隙間時間に繰り返し見直していただけます。</div></div>
+      <div class="faq-item"><div class="faq-q">分割払いはできますか？<div class="faq-icon">+</div></div><div class="faq-a">はい、クレジットカードによる分割払い（3回・6回・12回）に対応しています。詳細は申し込みフォームにてご確認ください。</div></div>
+      <div class="faq-item"><div class="faq-q">受講後に転職・昇給に活かせますか？<div class="faq-icon">+</div></div><div class="faq-a">受講生のうち約68%が「職場での評価が上がった」と回答しています（2025年受講生アンケートより）。転職活動中の方への職務経歴書添削サービスもあります（別途）。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-bg-text">HISHO</div>
+  <div class="section-inner">
+    <p class="section-label" style="color:var(--rose);"><span>APPLY NOW</span></p>
+    <h2 class="section-title"><span>気になったら、<br>のぞいてみてください。</span></h2>
+    <div class="divider" style="margin:24px auto 40px; background:var(--rose);" id="cta-divider"></div>
+    <p>難しく考えなくていいです。<br>「ちょっと話を聞いてみようかな」それだけで十分。<br>あなたのペースで、一歩踏み出してみましょう。</p>
+    <div class="cta-btn-wrap">
+      <a href="https://lin.ee/zu6WcOMO" target="_blank" class="btn-cta-main magnetic">
+        <span>無料で参加する →</span>
+      </a>
+    </div>
+    <p class="cta-note">✦ 参加費無料 / オンライン / 60分　✦ いつでも退会できます</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 AI HISHO ACADEMY. All rights reserved.</p>
+</footer>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── MODAL ───
+const overlay = document.getElementById('modal-overlay');
+const openModal = () => { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; };
+const closeModal = () => { overlay.classList.remove('open'); document.body.style.overflow = ''; };
+
+document.querySelectorAll('.btn-primary, .btn-cta-main, .nav-cta').forEach(btn => {
+  btn.addEventListener('click', e => { e.preventDefault(); openModal(); });
+});
+document.getElementById('modal-close').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+document.getElementById('seminar-form').addEventListener('submit', () => {
+  setTimeout(() => {
+    closeModal();
+    window.open('https://lin.ee/zu6WcOMO', '_blank');
+  }, 800);
+});
+
+// ─── SCROLL PROGRESS ───
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ─── CUSTOM CURSOR ───
+const outer = document.getElementById('cursor-outer');
+const dot   = document.getElementById('cursor-dot');
+let mx = 0, my = 0, ox = 0, oy = 0;
+window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function loop() {
+  ox += (mx - ox) * 0.12;
+  oy += (my - oy) * 0.12;
+  outer.style.left = ox + 'px';
+  outer.style.top  = oy + 'px';
+  dot.style.left   = mx + 'px';
+  dot.style.top    = my + 'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a, button, .pain-card, .lesson-card, .faq-q').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
+
+// ─── HERO ANIMATION ───
+const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+heroTl
+  .to('.hero-tag span', { y: 0, opacity: 1, duration: 0.8, delay: 0.3 })
+  .to('.reveal-inner', { y: '0%', duration: 1, stagger: 0.12 }, '-=0.4')
+  .to('.hero-sub', { opacity: 1, y: 0, duration: 0.8 }, '-=0.3')
+  .to('.btn-primary', { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
+  .to('.hero-note', { opacity: 1, duration: 0.5 }, '-=0.2')
+  .to('.counter-item', { opacity: 1, y: 0, stagger: 0.1, duration: 0.6 }, '-=0.4');
+
+// ─── HERO PARALLAX ───
+gsap.to('#hero-parallax', {
+  yPercent: 20,
+  ease: 'none',
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+
+// ─── COUNTER ───
+document.querySelectorAll('.counter-num').forEach(el => {
+  const target = parseInt(el.dataset.target);
+  ScrollTrigger.create({
+    trigger: el, start: 'top 90%',
+    onEnter: () => {
+      gsap.to({ val: 0 }, {
+        val: target, duration: 1.8, ease: 'power2.out',
+        onUpdate: function() { el.textContent = Math.ceil(this.targets()[0].val) + (target === 68 ? '%' : '+'); }
+      });
+    }, once: true
+  });
+});
+
+// ─── SECTION LABELS + TITLES ───
+document.querySelectorAll('.section-label span').forEach(el => {
+  gsap.to(el, {
+    y: 0, duration: 0.7, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 90%' }
+  });
+});
+document.querySelectorAll('.section-title span').forEach(el => {
+  gsap.to(el, {
+    y: 0, duration: 0.9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%' }
+  });
+});
+
+// ─── DIVIDERS ───
+document.querySelectorAll('.divider').forEach(el => {
+  gsap.to(el, {
+    width: 40, duration: 0.8, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 90%' }
+  });
+});
+
+// ─── PAIN CARDS ───
+gsap.to('.pain-card', {
+  y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out',
+  scrollTrigger: { trigger: '.pain-grid', start: 'top 80%' }
+});
+
+// ─── ABOUT IMAGE PARALLAX ───
+gsap.to('#about-img', {
+  scale: 1, duration: 1,
+  scrollTrigger: { trigger: '#about-img-wrap', start: 'top 80%', once: true }
+});
+gsap.to('#about-float', {
+  opacity: 1, y: 0, duration: 0.8, delay: 0.4,
+  scrollTrigger: { trigger: '#about-img-wrap', start: 'top 70%', once: true }
+});
+gsap.to('.about-points li', {
+  opacity: 1, x: 0, duration: 0.6, stagger: 0.12, ease: 'power2.out',
+  scrollTrigger: { trigger: '.about-points', start: 'top 85%' }
+});
+
+// ─── CURRICULUM CARDS ───
+gsap.to('.lesson-card', {
+  y: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power2.out',
+  scrollTrigger: { trigger: '.curriculum-grid', start: 'top 80%' }
+});
+
+// ─── INSTRUCTOR ───
+gsap.to('.instructor-photo', {
+  scale: 1, opacity: 1, duration: 0.9, ease: 'back.out(1.2)',
+  scrollTrigger: { trigger: '.instructor-wrap', start: 'top 75%' }
+});
+gsap.to('.instructor-info', {
+  x: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+  scrollTrigger: { trigger: '.instructor-wrap', start: 'top 75%' }
+});
+
+// ─── VOICE CARDS ───
+gsap.to('.voice-card', {
+  y: 0, opacity: 1, duration: 0.7, stagger: 0.15, ease: 'power3.out',
+  scrollTrigger: { trigger: '.voice-grid', start: 'top 80%' }
+});
+
+// ─── PRICE CARDS ───
+gsap.to('.price-card', {
+  y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out',
+  scrollTrigger: { trigger: '.price-cards', start: 'top 80%' }
+});
+
+// ─── FAQ ───
+gsap.to('.faq-item', {
+  x: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out',
+  scrollTrigger: { trigger: '.faq-list', start: 'top 80%' }
+});
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// ─── MAGNETIC BUTTONS ───
+document.querySelectorAll('.magnetic').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const r = btn.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+    gsap.to(btn, { x: dx * 0.25, y: dy * 0.25, duration: 0.4, ease: 'power2.out' });
+  });
+  btn.addEventListener('mouseleave', () => {
+    gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' });
+  });
+});
+
+// ─── NAV HIDE ON SCROLL DOWN ───
+let lastY = 0;
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('nav');
+  const y = window.scrollY;
+  nav.style.transform = y > lastY && y > 100 ? 'translateY(-100%)' : 'translateY(0)';
+  nav.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1)';
+  lastY = y;
+});
+</script>
+</body>
+</html>
