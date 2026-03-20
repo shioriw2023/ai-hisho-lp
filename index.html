@@ -629,20 +629,10 @@
         </select>
         <p style="font-size:11px;color:var(--mid);margin-top:6px;">※ 平日10:00〜18:00の空き枠から選択できます（各90分）</p>
       </div>
-      <div class="form-group">
-        <label>今回のセミナーをどこで知りましたか？</label>
-        <select name="source">
-          <option value="" disabled selected>選択してください</option>
-          <option value="Instagram">Instagram</option>
-          <option value="X（Twitter）">X（Twitter）</option>
-          <option value="TikTok">TikTok</option>
-          <option value="YouTube">YouTube</option>
-          <option value="Google検索">Google検索</option>
-          <option value="友人・知人の紹介">友人・知人の紹介</option>
-          <option value="公式LINE">公式LINE</option>
-          <option value="その他">その他</option>
-        </select>
-      </div>
+      <input type="hidden" name="referrer" id="f-referrer" />
+      <input type="hidden" name="utm_source" id="f-utm-source" />
+      <input type="hidden" name="utm_medium" id="f-utm-medium" />
+      <input type="hidden" name="utm_campaign" id="f-utm-campaign" />
       <button type="submit" class="form-submit">フォームを送信して専用LINEに登録する</button>
     </form>
     <p class="modal-note">✦ 送信後、公式LINEの登録ページへ移動します</p>
@@ -972,6 +962,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
 gsap.registerPlugin(ScrollTrigger);
+
+// ─── REFERRER & UTM 自動取得 ───
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  document.getElementById('f-referrer').value    = document.referrer || '直接アクセス';
+  document.getElementById('f-utm-source').value   = params.get('utm_source')   || '';
+  document.getElementById('f-utm-medium').value   = params.get('utm_medium')   || '';
+  document.getElementById('f-utm-campaign').value = params.get('utm_campaign') || '';
+})();
 
 // ─── LOAD CALENDAR SLOTS ───
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwaTZHWskFh4Pmtr63BltzIMqiuZQT0WWEXIAUJGuYiSR2a5I4fagQVog-hRyOjc9Fh/exec';
